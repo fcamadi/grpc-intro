@@ -32,8 +32,7 @@ public class BankService extends BankServiceGrpc.BankServiceImplBase {
         }
 
         for (int i = 0; i < (amount / 10); i++) {
-            Money.newBuilder().setValue(10).build();
-            responseObserver.onNext(Money.newBuilder().build());
+            responseObserver.onNext(Money.newBuilder().setValue(10).build());
             AccountDBMap.deduceBalance(accountNumber, 10);
         }
         responseObserver.onCompleted();
