@@ -1,5 +1,6 @@
 package org.francd.client;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Status;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -19,12 +21,15 @@ public class BankClientTest {
 
     private BankServiceGrpc.BankServiceBlockingStub bankServiceBlockingStub;
 
+    private BankServiceGrpc.BankServiceStub bankServiceStub;
+
     @BeforeAll
     void setup() {
         ManagedChannel managedChannel = ManagedChannelBuilder.forAddress("localhost", 6565)
                 .usePlaintext()
                 .build();
         bankServiceBlockingStub = BankServiceGrpc.newBlockingStub(managedChannel);
+        bankServiceStub = BankServiceGrpc.newStub(managedChannel);
     }
 
     @Test
@@ -61,5 +66,22 @@ public class BankClientTest {
                         .forEachRemaining(money -> System.out.println("Received: " + money.getValue())));
 
         assertTrue(thrown.getMessage().contains("FAILED_PRECONDITION"));
+    }
+
+    @Test
+    void withdrawAsyncTest() {
+        WithdrawRequest withdrawRequest = WithdrawRequest.newBuilder()
+                .setAccountNumber(9)
+                .setAmount(50)
+                .build();
+
+        // The async version needs a second param as a callback method to be called on upon each responwe received:
+        //
+        // public void withDraw(org.francd.model.WithdrawRequest request,
+        //        io.grpc.stub.StreamObserver<org.francd.model.Money> responseObserver) { ..
+        //
+        // So we implement it and use it here
+        bankServiceStub.withDraw(withdrawRequest, new MoneyStreamingResponse());
+        Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);  // just to see some output
     }
 }
