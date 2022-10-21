@@ -1,5 +1,6 @@
 package org.francd.server;
 
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import org.francd.model.*;
 
@@ -24,15 +25,16 @@ public class BankService extends BankServiceGrpc.BankServiceImplBase {
         int amount = request.getAmount();
         int balance = AccountDBMap.getBalance(accountNumber);
 
+        if (balance < amount) {
+            Status status = Status.FAILED_PRECONDITION.withDescription("Not enough balance. You have only " + balance);
+            responseObserver.onError(status.asRuntimeException());
+            return;
+        }
+
         for (int i = 0; i < (amount / 10); i++) {
             Money.newBuilder().setValue(10).build();
             responseObserver.onNext(Money.newBuilder().build());
             AccountDBMap.deduceBalance(accountNumber, 10);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
         responseObserver.onCompleted();
     }
