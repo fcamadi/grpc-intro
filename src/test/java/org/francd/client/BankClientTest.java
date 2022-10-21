@@ -2,12 +2,12 @@ package org.francd.client;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import org.francd.model.Balance;
-import org.francd.model.BalanceCheckRequest;
-import org.francd.model.BankServiceGrpc;
+import org.francd.model.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+
+import java.util.Iterator;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class BankClientTest {
@@ -29,7 +29,19 @@ public class BankClientTest {
                 .build();
 
         Balance balanceResponse = bankServiceBlockingStub.getBalance(balanceRequest);
-        System.out.println("Received balance amount: "+balanceResponse.getAmount());
+        System.out.println("Received balance amount: " + balanceResponse.getAmount());
     }
+
+    @Test
+    void withdrawTest() {
+        WithdrawRequest withdrawRequest = WithdrawRequest.newBuilder()
+                .setAccountNumber(7)
+                .setAmount(40)
+                .build();
+        // Iterator<Money> moneyIterator = bankServiceBlockingStub.withDraw(withdrawRequest);
+        bankServiceBlockingStub.withDraw(withdrawRequest)
+                .forEachRemaining(money -> System.out.println("Received: " + money.getValue()));
+    }
+
 
 }
