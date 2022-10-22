@@ -1,17 +1,17 @@
 package org.francd.client;
 
-import com.google.common.util.concurrent.Uninterruptibles;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
-import org.francd.model.*;
+import org.francd.model.Balance;
+import org.francd.model.BalanceCheckRequest;
+import org.francd.model.BankServiceGrpc;
+import org.francd.model.WithdrawRequest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-import java.util.Iterator;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -69,11 +69,13 @@ public class BankClientTest {
     }
 
     @Test
-    void withdrawAsyncTest() {
+    void withdrawAsyncTest() throws InterruptedException {
         WithdrawRequest withdrawRequest = WithdrawRequest.newBuilder()
                 .setAccountNumber(9)
                 .setAmount(50)
                 .build();
+
+        CountDownLatch latch = new CountDownLatch(1);
 
         // The async version needs a second param as a callback method to be called on upon each responwe received:
         //
@@ -81,7 +83,7 @@ public class BankClientTest {
         //        io.grpc.stub.StreamObserver<org.francd.model.Money> responseObserver) { ..
         //
         // So we implement it and use it here
-        bankServiceStub.withDraw(withdrawRequest, new MoneyStreamingResponse());
-        Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);  // just to see some output
+        bankServiceStub.withDraw(withdrawRequest, new MoneyStreamingResponse(latch));
+        latch.await();
     }
 }
