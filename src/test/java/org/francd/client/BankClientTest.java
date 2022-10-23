@@ -3,10 +3,9 @@ package org.francd.client;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
-import org.francd.model.Balance;
-import org.francd.model.BalanceCheckRequest;
-import org.francd.model.BankServiceGrpc;
-import org.francd.model.WithdrawRequest;
+import io.grpc.stub.StreamObserver;
+import org.francd.model.*;
+import org.francd.server.AccountDBMap;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -86,4 +85,22 @@ public class BankClientTest {
         bankServiceStub.withDraw(withdrawRequest, new MoneyStreamingResponse(latch));
         latch.await();
     }
+
+    @Test
+    void cashStreamingRequestTest() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        StreamObserver<DepositRequest> depositRequestStreamObserver = bankServiceStub.cashDeposit(new BalanceStreamObserver(latch));
+        for (int i = 0; i < 10; i++) {
+            DepositRequest depositRequest = DepositRequest.newBuilder()
+                    .setAccountNumber(8)
+                    .setAmount(10)
+                    .build();
+            depositRequestStreamObserver.onNext(depositRequest);
+            System.out.println("depositRequestStreamObserver - amount in bank account: "+ AccountDBMap.getBalance(8));
+        }
+        depositRequestStreamObserver.onCompleted();
+        latch.await();
+        System.out.println("cashStreamingRequestTest END");
+    }
+
 }
