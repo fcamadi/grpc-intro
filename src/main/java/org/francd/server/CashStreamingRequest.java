@@ -3,7 +3,6 @@ package org.francd.server;
 import io.grpc.stub.StreamObserver;
 import org.francd.model.Balance;
 import org.francd.model.DepositRequest;
-import org.francd.server.AccountDBMap;
 
 public class CashStreamingRequest implements StreamObserver<DepositRequest> {
 

@@ -7,7 +7,7 @@ import java.util.stream.IntStream;
 
 public class AccountDBMap {
 
-    private static Map<Integer, Integer> MAP = IntStream
+    private final static Map<Integer, Integer> MAP = IntStream
             .rangeClosed(1, 10)
             .boxed()
             .collect(Collectors.toMap(Function.identity(), v -> v * 10));
@@ -23,6 +23,10 @@ public class AccountDBMap {
 
     public static Integer deduceBalance(int accountId, int amount) {
         return MAP.computeIfPresent(accountId, (k, v) -> v - amount);
+    }
+
+    public static void printAccountsDetails() {
+        System.out.println(MAP);
     }
 
 }
