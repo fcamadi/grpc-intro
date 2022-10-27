@@ -19,9 +19,8 @@ public class TransferStreamingResponse implements StreamObserver<TransferRespons
         System.out.println("Status : "+transferResponse.getStatus());
         for (Account account : transferResponse.getAccountsList()) {
             System.out.println("Account Number[amount]: "+account.getAccountNumber()+"["+account.getAmount()+"]");
-            System.out.println("----------------------------------------");
         }
-
+        System.out.println("----------------------------------------");
     }
 
     @Override
@@ -31,7 +30,7 @@ public class TransferStreamingResponse implements StreamObserver<TransferRespons
 
     @Override
     public void onCompleted() {
-        System.out.println("All transfer done!!!");
+        System.out.println("All transfers done!!!");
         latch.countDown();
     }
 }

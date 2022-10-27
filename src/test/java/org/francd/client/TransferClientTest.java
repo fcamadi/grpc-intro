@@ -31,7 +31,7 @@ public class TransferClientTest {
         TransferStreamingResponse transferStreamingResponse = new TransferStreamingResponse(latch);
         StreamObserver<TransferRequest> transferRequestObserver = transferServiceStub.transfer(transferStreamingResponse);
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 20; i++) {
             TransferRequest request = TransferRequest.newBuilder()
                     .setFromAccount(ThreadLocalRandom.current().nextInt(1, 11))
                     .setToAccount(ThreadLocalRandom.current().nextInt(1, 11))
