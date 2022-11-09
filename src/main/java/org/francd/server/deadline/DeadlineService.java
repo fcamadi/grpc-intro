@@ -1,6 +1,7 @@
 package org.francd.server.deadline;
 
 import com.google.common.util.concurrent.Uninterruptibles;
+import io.grpc.Context;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import org.francd.model.*;
@@ -40,6 +41,10 @@ public class DeadlineService extends BankServiceGrpc.BankServiceImplBase {
         for (int i = 0; i < (amount / 10); i++) {
             //simulate a high load
             Uninterruptibles.sleepUninterruptibly(3, TimeUnit.SECONDS);
+            if (Context.current().isCancelled()) {
+                System.out.println("No one is listening! We stop the machine!");
+                break;
+            }
             responseObserver.onNext(Money.newBuilder().setValue(10).build());
             System.out.println("Delivered 10#");
             AccountDBMap.deduceBalance(accountNumber, 10);
