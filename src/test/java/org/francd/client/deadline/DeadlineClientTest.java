@@ -55,12 +55,19 @@ public class DeadlineClientTest {
     @Test
     void withdrawTest() {
         WithdrawRequest withdrawRequest = WithdrawRequest.newBuilder()
-                .setAccountNumber(7)
-                .setAmount(80)
+                .setAccountNumber(6)
+                .setAmount(50)
                 .build();
-        // Iterator<Money> moneyIterator = bankServiceBlockingStub.withDraw(withdrawRequest);
-        bankServiceBlockingStub.withDraw(withdrawRequest)
-                .forEachRemaining(money -> System.out.println("Received: " + money.getValue()));
+
+        try {
+            bankServiceBlockingStub
+                    .withDeadlineAfter(9, TimeUnit.SECONDS)
+                    .withDraw(withdrawRequest)
+                    .forEachRemaining(money -> System.out.println("Received: " + money.getValue()));
+        } catch (StatusRuntimeException e) {
+            //do something meaningful ..
+            System.out.println("Something went wrong: "+e.getStatus().getDescription());
+        }
     }
 
     @Test

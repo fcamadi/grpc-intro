@@ -38,7 +38,10 @@ public class DeadlineService extends BankServiceGrpc.BankServiceImplBase {
         }
 
         for (int i = 0; i < (amount / 10); i++) {
+            //simulate a high load
+            Uninterruptibles.sleepUninterruptibly(3, TimeUnit.SECONDS);
             responseObserver.onNext(Money.newBuilder().setValue(10).build());
+            System.out.println("Delivered 10#");
             AccountDBMap.deduceBalance(accountNumber, 10);
         }
         responseObserver.onCompleted();
