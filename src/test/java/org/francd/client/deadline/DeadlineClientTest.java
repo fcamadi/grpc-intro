@@ -12,6 +12,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import java.util.concurrent.TimeUnit;
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DeadlineClientTest {
 
@@ -51,6 +53,7 @@ public class DeadlineClientTest {
 
         try {
             bankServiceBlockingStub
+                    .withDeadlineAfter(5, TimeUnit.SECONDS)
                     .withDraw(withdrawRequest)
                     .forEachRemaining(money -> System.out.println("Received: " + money.getValue()));
         } catch (StatusRuntimeException e) {

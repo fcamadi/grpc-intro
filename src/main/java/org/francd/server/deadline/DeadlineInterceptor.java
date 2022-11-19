@@ -2,6 +2,7 @@ package org.francd.server.deadline;
 
 import io.grpc.*;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class DeadlineInterceptor implements ClientInterceptor {
@@ -11,7 +12,12 @@ public class DeadlineInterceptor implements ClientInterceptor {
             CallOptions callOptions,
             Channel channel) {
 
-        //return channel.newCall(methodDescriptor, callOptions); // <- this is like doing nothing
-        return channel.newCall(methodDescriptor, callOptions.withDeadline(Deadline.after(4, TimeUnit.SECONDS)));
+        Deadline deadline = callOptions.getDeadline();
+        if (Objects.isNull(deadline)) {
+            System.out.println("In the DeadlineInterceptor - default deadline");
+            callOptions = callOptions.withDeadline(Deadline.after(4, TimeUnit.SECONDS));
+        }
+        System.out.println("In the DeadlineInterceptor - methodDescriptor: "+methodDescriptor.getServiceName());
+        return channel.newCall(methodDescriptor, callOptions);
     }
 }

@@ -40,7 +40,7 @@ public class DeadlineService extends BankServiceGrpc.BankServiceImplBase {
 
         for (int i = 0; i < (amount / 10); i++) {
             //simulate a high load
-            Uninterruptibles.sleepUninterruptibly(3, TimeUnit.SECONDS);
+            Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
             if (Context.current().isCancelled()) {
                 System.out.println("No one is listening! We stop the machine!");
                 break;
