@@ -17,14 +17,14 @@ public class AuthInterceptor implements ServerInterceptor {
         System.out.println("Client token received: "+clientToken);
 
         if (validateToken(clientToken)) {
-            serverCallHandler.startCall(serverCall, metadata);
+            return serverCallHandler.startCall(serverCall, metadata);
         } else {
             Status statusKo = Status.UNAUTHENTICATED.withDescription("Invalid token");
             serverCall.close(statusKo, metadata);
+            return  new ServerCall.Listener<>() {
+            };
         }
-        //return null; do not return null!
-        return  new ServerCall.Listener<>() {
-        };
+        //return null; //do not return null!
     }
 
     private boolean validateToken(String token) {
