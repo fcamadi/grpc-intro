@@ -1,4 +1,4 @@
-package org.francd.server.metadata;
+package org.francd.client.metadata;
 
 import io.grpc.CallCredentials;
 import io.grpc.Metadata;
