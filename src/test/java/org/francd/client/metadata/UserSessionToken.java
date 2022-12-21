@@ -2,7 +2,6 @@ package org.francd.client.metadata;
 
 import io.grpc.CallCredentials;
 import io.grpc.Metadata;
-import org.francd.client.metadata.ClientConstants;
 
 import java.util.concurrent.Executor;
 

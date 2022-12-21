@@ -13,7 +13,9 @@ public class AuthInterceptor implements ServerInterceptor {
             Metadata metadata,
             ServerCallHandler<ReqT, RespT> serverCallHandler) {
 
-        String clientToken = metadata.get(ServerConstants.TOKEN);
+        //String clientToken = metadata.get(ServerConstants.TOKEN); user token could be handled in another interceptor
+        String clientToken = metadata.get(ServerConstants.USER_TOKEN);
+
         System.out.println("Client token received: "+clientToken);
 
         if (validateToken(clientToken)) {
@@ -28,6 +30,7 @@ public class AuthInterceptor implements ServerInterceptor {
     }
 
     private boolean validateToken(String token) {
-        return Objects.nonNull(token) && ("bank-client-token".equals(token));
+        //return Objects.nonNull(token) && ("bank-client-token".equals(token));
+        return Objects.nonNull(token) && ("user-secret-x".equals(token));
     }
 }
