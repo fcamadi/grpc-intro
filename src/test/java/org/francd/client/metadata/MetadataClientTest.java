@@ -8,6 +8,7 @@ import org.francd.model.Balance;
 import org.francd.model.BalanceCheckRequest;
 import org.francd.model.BankServiceGrpc;
 import org.francd.model.WithdrawRequest;
+import org.francd.server.metadata.UserRole;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -38,7 +39,10 @@ public class MetadataClientTest {
 
         for (int i=0; i<20; i++) {
             int random = ThreadLocalRandom.current().nextInt(1,10);
-            String token = "user-secret-"+random;
+            int random2 = ThreadLocalRandom.current().nextInt(1,10);
+            String userRole = (random2 % 2 == 0) ? UserRole.PREMIUM.name() : UserRole.STANDARD.name();
+            String token = "user-secret-"+random+":"+userRole;
+
             System.out.println("Token["+i+"]: "+token);
             try {
                 Balance balanceResponse = bankServiceBlockingStub
