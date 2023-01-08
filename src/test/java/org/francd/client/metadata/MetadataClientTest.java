@@ -8,11 +8,11 @@ import org.francd.model.Balance;
 import org.francd.model.BalanceCheckRequest;
 import org.francd.model.BankServiceGrpc;
 import org.francd.model.WithdrawRequest;
-import org.francd.server.deadline.DeadlineInterceptor;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -36,12 +36,19 @@ public class MetadataClientTest {
                 .setAccountNumber(7)
                 .build();
 
-        try {
-            Balance balanceResponse = bankServiceBlockingStub.getBalance(balanceRequest);
-            System.out.println("Received balance amount: " + balanceResponse.getAmount());
-        } catch (StatusRuntimeException e) {
-            //do something meaningful ..
-            System.out.println("Something went wrong: "+e.getStatus().getDescription());
+        for (int i=0; i<20; i++) {
+            int random = ThreadLocalRandom.current().nextInt(1,10);
+            String token = "user-secret-"+random;
+            System.out.println("Token["+i+"]: "+token);
+            try {
+                Balance balanceResponse = bankServiceBlockingStub
+                        .withCallCredentials(new UserSessionToken(token))
+                        .getBalance(balanceRequest);
+                System.out.println("Received balance amount: " + balanceResponse.getAmount());
+            } catch (StatusRuntimeException e) {
+                //do something meaningful ..
+                System.out.println("Something went wrong: " + e.getStatus().getDescription());
+            }
         }
     }
 
