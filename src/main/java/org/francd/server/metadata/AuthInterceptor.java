@@ -5,6 +5,10 @@ import io.grpc.*;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+/*
+    user-secret-2:STANDARD
+    user-secret-3:PREMIUM
+ */
 public class AuthInterceptor implements ServerInterceptor {
 
     @Override
@@ -19,7 +23,12 @@ public class AuthInterceptor implements ServerInterceptor {
         System.out.println("Client token received: "+clientToken);
 
         if (validateToken(clientToken)) {
-            return serverCallHandler.startCall(serverCall, metadata);
+            UserRole userRole = extractUserRole(clientToken);
+            //store the role in the context:
+            Context context = Context.current().withValue(ServerConstants.CTX_USER_ROLE, userRole);
+            //return serverCallHandler.startCall(serverCall, metadata);
+            //now we pass the context to the service layer
+            return Contexts.interceptCall(context, serverCall, metadata, serverCallHandler);
         } else {
             Status statusKo = Status.UNAUTHENTICATED.withDescription("Invalid token");
             serverCall.close(statusKo, metadata);
@@ -31,6 +40,11 @@ public class AuthInterceptor implements ServerInterceptor {
 
     private boolean validateToken(String token) {
         //return Objects.nonNull(token) && ("bank-client-token".equals(token));
-        return Objects.nonNull(token) && ("user-secret-x".equals(token));
+        return Objects.nonNull(token) &&
+                ( ("user-secret-2".equals(token)) ||   ("user-secret-3".equals(token)) ) ;
+    }
+
+    private UserRole extractUserRole(String jwt) {
+        return jwt.endsWith(UserRole.PREMIUM.name()) ? UserRole.PREMIUM : UserRole.STANDARD;
     }
 }
