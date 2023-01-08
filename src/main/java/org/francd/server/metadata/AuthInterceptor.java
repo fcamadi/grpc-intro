@@ -41,7 +41,7 @@ public class AuthInterceptor implements ServerInterceptor {
     private boolean validateToken(String token) {
         //return Objects.nonNull(token) && ("bank-client-token".equals(token));
         return Objects.nonNull(token) &&
-                ( ("user-secret-2".equals(token)) ||   ("user-secret-3".equals(token)) ) ;
+                ( token.startsWith("user-secret-2") ||  token.startsWith("user-secret-3") ) ;
     }
 
     private UserRole extractUserRole(String jwt) {
