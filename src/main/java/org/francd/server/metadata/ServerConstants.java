@@ -12,4 +12,6 @@ public class ServerConstants {
             Metadata.Key.of("user-token", Metadata.ASCII_STRING_MARSHALLER);
 
     public static final Context.Key<UserRole> CTX_USER_ROLE =  Context.key("user-role");
+    // only for demostration purposes:
+    public static final Context.Key<UserRole> CTX_USER_ROLE_B =  Context.key("user-role");
 }

@@ -16,8 +16,20 @@ public class MetadataService extends BankServiceGrpc.BankServiceImplBase {
     public void getBalance(BalanceCheckRequest request, StreamObserver<Balance> responseObserver) {
 
         int accountNumber = request.getAccountNumber();
+        int amount = AccountDBMap.getBalance(accountNumber);
+
+        // get role from context
+        UserRole userRole = ServerConstants.CTX_USER_ROLE.get();
+        // only for demostration purposes, because CTX_USER_ROLE_B was not set
+        UserRole userRoleB = ServerConstants.CTX_USER_ROLE_B.get();
+
+        amount = UserRole.PREMIUM.equals(userRole) ? amount : amount - 15;
+
+        System.out.println("userRole: "+userRole);
+        System.out.println("userRoleB: "+userRoleB);
+
         Balance balance = Balance.newBuilder()
-                .setAmount(AccountDBMap.getBalance(accountNumber))
+                .setAmount(amount)
                 .build();
         responseObserver.onNext(balance);
         responseObserver.onCompleted();
