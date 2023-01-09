@@ -70,8 +70,8 @@ public class BankClientTest {
     @Test
     void withdrawAsyncTest() throws InterruptedException {
         WithdrawRequest withdrawRequest = WithdrawRequest.newBuilder()
-                .setAccountNumber(9)
-                .setAmount(50)
+                .setAccountNumber(10)
+                .setAmount(80)
                 .build();
 
         CountDownLatch latch = new CountDownLatch(1);
