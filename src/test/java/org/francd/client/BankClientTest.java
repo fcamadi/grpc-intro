@@ -1,8 +1,10 @@
 package org.francd.client;
 
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
+import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts;
+import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
+import io.grpc.netty.shaded.io.netty.handler.ssl.SslContext;
 import io.grpc.stub.StreamObserver;
 import org.francd.model.*;
 import org.francd.server.AccountDBMap;
@@ -10,6 +12,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import javax.net.ssl.SSLException;
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -23,9 +29,17 @@ public class BankClientTest {
     private BankServiceGrpc.BankServiceStub bankServiceStub;
 
     @BeforeAll
-    void setup() {
-        ManagedChannel managedChannel = ManagedChannelBuilder.forAddress("localhost", 6565)
-                .usePlaintext()
+    void setup() throws URISyntaxException, SSLException {
+
+        URL crtUrl = BankClientTest.class.getClassLoader().getResource("ca.cert.pem");
+        File caCert = new File(crtUrl.toURI());
+
+        SslContext sslContext = GrpcSslContexts.forClient()
+                .trustManager(caCert)
+                .build();
+
+        ManagedChannel managedChannel = NettyChannelBuilder.forAddress("localhost", 6565)
+                .sslContext(sslContext)
                 .build();
         bankServiceBlockingStub = BankServiceGrpc.newBlockingStub(managedChannel);
         bankServiceStub = BankServiceGrpc.newStub(managedChannel);
